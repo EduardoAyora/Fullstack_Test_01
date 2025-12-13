@@ -1,0 +1,81 @@
+import { Response } from 'express';
+import Project from '../models/Project';
+import { Types } from 'mongoose';
+import { ProjectRequest } from '../types/request';
+
+// Crear proyecto
+export const createProject = async (req: ProjectRequest, res: Response) => {
+  const { name } = req.body;
+
+  const project = await Project.create({
+    name,
+    creator: req.user.id,
+    collaborators: []
+  });
+
+  res.status(201).json(project);
+};
+
+// Obtener proyectos del usuario
+export const getProjects = async (req: ProjectRequest, res: Response) => {
+  const userId = new Types.ObjectId(req.user.id);
+
+  const projects = await Project.find({
+    $or: [
+      { creator: userId },
+      { collaborators: userId }
+    ]
+  }).populate('creator', 'name email');
+
+  res.json(projects);
+};
+
+// Actualizar proyecto
+export const updateProject = async (req: ProjectRequest, res: Response) => {
+  const { name } = req.body;
+
+  const project = req.project;
+  project.name = name ?? project.name;
+
+  await project.save();
+
+  res.json(project);
+};
+
+// Agregar colaborador
+export const addCollaborator = async (req: ProjectRequest, res: Response) => {
+  const { collaboratorId } = req.body;
+  const project = req.project;
+
+  if (project.collaborators.includes(collaboratorId)) {
+    return res.status(400).json({ message: 'El usuario ya es colaborador' });
+  }
+
+  project.collaborators.push(new Types.ObjectId(collaboratorId));
+  await project.save();
+
+  res.json(project);
+};
+
+// Eliminar colaborador
+export const removeCollaborator = async (req: ProjectRequest, res: Response) => {
+  const { collaboratorId } = req.body;
+  const project = req.project;
+
+  project.collaborators = project.collaborators.filter(
+    (id) => id.toString() !== collaboratorId
+  );
+
+  await project.save();
+
+  res.json(project);
+};
+
+// Eliminar proyecto
+export const deleteProject = async (req: ProjectRequest, res: Response) => {
+  const project = req.project;
+
+  await project.deleteOne();
+
+  res.json({ message: 'Proyecto eliminado correctamente' });
+};
