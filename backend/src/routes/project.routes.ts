@@ -200,11 +200,11 @@ router.delete('/:projectId', isProjectCreator, deleteProject);
  *           schema:
  *             type: object
  *             required:
- *               - collaboratorId
+ *               - email
  *             properties:
- *               collaboratorId:
+ *               email:
  *                 type: string
- *                 example: 64f1c8c2b1d2f7e8a9c0d1e2
+ *                 example: ejemplo@mail.com
  *     responses:
  *       200:
  *         description: Colaborador agregado correctamente

@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import Project from '../models/Project';
-import { Types } from 'mongoose';
+import User from '../models/User';
 
 // Crear proyecto
 export const createProject = async (req: Request, res: Response) => {
@@ -80,14 +80,22 @@ export const deleteProject = async (req: Request, res: Response) => {
 
 // Agregar colaborador
 export const addCollaborator = async (req: Request, res: Response) => {
-  const { collaboratorId } = req.body;
+  const { email } = req.body;
   const project = req.project!;
 
-  if (project.collaborators.includes(collaboratorId)) {
+  const user = await User.findOne({ email: email?.toLowerCase() });
+  if (!user) {
+    return res.status(404).json({ message: 'Usuario no encontrado' });
+  }
+
+  const alreadyCollaborator = project.collaborators.some((id) =>
+    id.equals(user._id)
+  );
+  if (alreadyCollaborator) {
     return res.status(400).json({ message: 'El usuario ya es colaborador' });
   }
 
-  project.collaborators.push(new Types.ObjectId(collaboratorId));
+  project.collaborators.push(user._id);
   await project.save();
 
   res.json(project);

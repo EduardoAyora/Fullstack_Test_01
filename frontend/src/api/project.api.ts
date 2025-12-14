@@ -8,3 +8,8 @@ export const createProjectRequest = (name: string) =>
 
 export const getProjectById = (projectId: string) =>
   api.get(`/projects/${projectId}`);
+
+export const addCollaboratorRequest = (
+  projectId: string,
+  email: string
+) => api.post(`/projects/${projectId}/collaborators`, { email });
