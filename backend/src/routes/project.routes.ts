@@ -55,13 +55,26 @@ router.post('/', createProject);
  * /projects:
  *   get:
  *     summary: Listar proyectos del usuario
- *     description: Retorna todos los proyectos donde el usuario autenticado es creador o colaborador.
+ *     description: Retorna los proyectos donde el usuario es creador o colaborador con paginación.
  *     tags: [Projects]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Número de página (por defecto 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: Cantidad de proyectos por página (por defecto 10)
  *     responses:
  *       200:
- *         description: Listado de proyectos obtenido correctamente
+ *         description: Listado paginado de proyectos
  *       401:
  *         description: Token faltante o inválido
  */

@@ -31,15 +31,35 @@ export const getProjectById = async (req: Request, res: Response) => {
 // Obtener proyectos del usuario
 export const getProjects = async (req: Request, res: Response) => {
   const userId = req.user!._id;
+  const page = Math.max(parseInt(req.query.page as string) || 1, 1);
+  const limit = Math.max(parseInt(req.query.limit as string) || 10, 1);
+  const skip = (page - 1) * limit;
 
-  const projects = await Project.find({
+  const filter = {
     $or: [
       { creator: userId },
       { collaborators: userId }
     ]
-  }).populate('creator', 'name email');
+  };
 
-  res.json(projects);
+  const [total, projects] = await Promise.all([
+    Project.countDocuments(filter),
+    Project.find(filter)
+      .populate('creator', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+  ]);
+
+  res.json({
+    projects,
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit) || 0,
+    hasNextPage: page * limit < total,
+    hasPrevPage: page > 1
+  });
 };
 
 // Actualizar proyecto
