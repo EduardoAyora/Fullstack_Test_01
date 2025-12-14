@@ -9,3 +9,5 @@ export const registerRequest = (
   password: string
 ) =>
   api.post('/auth/register', { name, email, password });
+
+export const profileRequest = () => api.get('/auth/profile');

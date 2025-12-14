@@ -13,11 +13,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [token]);
 
-    const login = (token: string, user: User) => {
+    const login = (token: string) => {
         setToken(token);
         setAuthToken(token);
-        setUser(user);
     };
+
+    const loadUserData = (user: User) => {
+        setUser(user);
+    }
 
     const logout = () => {
         removeToken();
@@ -32,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 user,
                 login,
                 logout,
+                loadUserData,
                 isAuthenticated: !!token,
             }}
         >
