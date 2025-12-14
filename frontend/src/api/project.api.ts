@@ -21,3 +21,9 @@ export const removeCollaboratorRequest = (
   api.delete(`/projects/${projectId}/collaborators`, {
     data: { collaboratorId },
   });
+
+export const updateProjectRequest = (projectId: string, name: string) =>
+  api.put(`/projects/${projectId}`, { name });
+
+export const deleteProjectRequest = (projectId: string) =>
+  api.delete(`/projects/${projectId}`);

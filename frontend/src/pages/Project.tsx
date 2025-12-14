@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   getProjectById,
   removeCollaboratorRequest,
+  deleteProjectRequest,
 } from '../api/project.api';
 import { deleteTaskRequest, getTasksByProject } from '../api/task.api';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { AddCollaboratorModal } from '../components/AddCollaboratorModal';
 import { TaskItem } from '../components/TaskItem';
+import { EditProjectModal } from '../components/EditProjectModal';
+import { ConfirmDeleteProject } from '../components/ConfirmDeleteProject';
 
 type Person = {
   _id?: string;
@@ -35,6 +38,7 @@ type Task = {
 
 export const Project = () => {
   const { projectId: routeProjectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -44,9 +48,12 @@ export const Project = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isCollaboratorModalOpen, setIsCollaboratorModalOpen] =
     useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [removingCollaboratorId, setRemovingCollaboratorId] =
     useState<string | null>(null);
   const [removingTaskId, setRemovingTaskId] = useState<string | null>(null);
+  const [deletingProject, setDeletingProject] = useState(false);
 
   useEffect(() => {
     if (routeProjectId) {
@@ -125,6 +132,23 @@ export const Project = () => {
     }
   };
 
+  const handleDeleteProject = async () => {
+    if (!projectId) return;
+    try {
+      setDeletingProject(true);
+      setError('');
+      await deleteProjectRequest(projectId);
+      navigate('/dashboard');
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || 'No se pudo eliminar el proyecto.';
+      setError(message);
+    } finally {
+      setDeletingProject(false);
+      setIsDeleteConfirmOpen(false);
+    }
+  };
+
   const priorityStyles: Record<TaskPriority, string> = useMemo(
     () => ({
       baja: 'bg-emerald-500/15 text-emerald-200 ring-1 ring-emerald-500/30',
@@ -153,24 +177,73 @@ export const Project = () => {
     <div className="min-h-screen bg-linear-to-br from-slate-800 via-slate-900 to-black text-slate-100">
       <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+          <div className="space-y-1">
             <p className="text-sm text-slate-300">Proyecto</p>
-            <h1 className="text-3xl font-semibold text-white">
-              {loadingProject ? 'Cargando…' : project?.name || 'Proyecto'}
-            </h1>
-            <p className="mt-2 text-sm text-slate-300">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-semibold text-white">
+                {loadingProject ? 'Cargando…' : project?.name || 'Proyecto'}
+              </h1>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(true)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-white/25 hover:bg-white/10"
+                title="Editar nombre"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-4 w-4"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmOpen(true)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-rose-300/70 hover:bg-rose-500/20 hover:text-rose-100"
+                title="Eliminar proyecto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-4 w-4"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" x2="10" y1="11" y2="17" />
+                  <line x1="14" x2="14" y1="11" y2="17" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm text-slate-300">
               Creador:{' '}
               {project?.creator?.name ||
                 project?.creator?.email ||
                 'Sin datos'}
             </p>
           </div>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/40 hover:bg-white/5"
-          >
-            Volver al dashboard
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/40 hover:bg-white/5"
+            >
+              Volver al dashboard
+            </Link>
+          </div>
         </header>
 
         {error && (
@@ -290,6 +363,19 @@ export const Project = () => {
         projectId={projectId}
         onAdded={() => fetchProject(projectId)}
         onClose={() => setIsCollaboratorModalOpen(false)}
+      />
+      <EditProjectModal
+        open={isEditModalOpen}
+        projectId={projectId}
+        currentName={project?.name}
+        onUpdated={() => fetchProject(projectId)}
+        onClose={() => setIsEditModalOpen(false)}
+      />
+      <ConfirmDeleteProject
+        open={isDeleteConfirmOpen}
+        onClose={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteProject}
+        loading={deletingProject}
       />
     </div>
   );
