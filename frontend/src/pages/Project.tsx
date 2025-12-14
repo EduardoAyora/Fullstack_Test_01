@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { getProjectById } from '../api/project.api';
-import { getTasksByProject } from '../api/task.api';
+import {
+  getProjectById,
+  removeCollaboratorRequest,
+} from '../api/project.api';
+import { deleteTaskRequest, getTasksByProject } from '../api/task.api';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { AddCollaboratorModal } from '../components/AddCollaboratorModal';
+import { TaskItem } from '../components/TaskItem';
 
 type Person = {
+  _id?: string;
   name?: string;
   email?: string;
 };
@@ -39,6 +44,9 @@ export const Project = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isCollaboratorModalOpen, setIsCollaboratorModalOpen] =
     useState(false);
+  const [removingCollaboratorId, setRemovingCollaboratorId] =
+    useState<string | null>(null);
+  const [removingTaskId, setRemovingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (routeProjectId) {
@@ -61,11 +69,28 @@ export const Project = () => {
     }
   };
 
+  const handleRemoveTask = async (taskId: string) => {
+    if (!projectId || !taskId) return;
+    try {
+      setRemovingTaskId(taskId);
+      setError('');
+      await deleteTaskRequest(projectId, taskId);
+      await fetchTasks(projectId);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message || 'No se pudo eliminar la tarea.';
+      setError(message);
+    } finally {
+      setRemovingTaskId(null);
+    }
+  };
+
   const fetchTasks = async (id: string) => {
     try {
       setLoadingTasks(true);
       setError('');
       const { data } = await getTasksByProject(id);
+      
       setTasks(data ?? []);
     } catch (err: any) {
       const message =
@@ -82,6 +107,23 @@ export const Project = () => {
     fetchTasks(projectId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+
+  const handleRemoveCollaborator = async (collaboratorId?: string) => {
+    if (!collaboratorId || !projectId) return;
+    try {
+      setRemovingCollaboratorId(collaboratorId);
+      setError('');
+      await removeCollaboratorRequest(projectId, collaboratorId);
+      await fetchProject(projectId);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        'No se pudo eliminar el colaborador.';
+      setError(message);
+    } finally {
+      setRemovingCollaboratorId(null);
+    }
+  };
 
   const priorityStyles: Record<TaskPriority, string> = useMemo(
     () => ({
@@ -160,9 +202,34 @@ export const Project = () => {
               project.collaborators.map((collaborator, index) => (
                 <span
                   key={`${collaborator.email ?? collaborator.name ?? index}-${index}`}
-                  className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 ring-1 ring-white/10"
+                  className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 ring-1 ring-white/10"
                 >
                   {collaborator.name || collaborator.email || 'Colaborador'}
+                  {collaborator._id && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveCollaborator(collaborator._id)
+                      }
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-transparent text-[10px] text-slate-100 transition hover:border-rose-400/70 hover:bg-rose-500/20 hover:text-rose-100"
+                      title="Eliminar colaborador"
+                      disabled={removingCollaboratorId === collaborator._id}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="h-3.5 w-3.5"
+                        aria-hidden="true"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M9.75 3a.75.75 0 0 0-.75.75V4.5H5.25a.75.75 0 0 0 0 1.5h.22l.53 12.04A2.25 2.25 0 0 0 8.25 20.25h7.5a2.25 2.25 0 0 0 2.25-2.21l.53-12.04h.22a.75.75 0 0 0 0-1.5h-3.75v-.75a.75.75 0 0 0-.75-.75h-3.75Zm4.5 1.5h-4.5v.75h4.5V4.5Zm-5.78 3a.75.75 0 0 1 .78.71l.38 7.5a.75.75 0 1 1-1.5.08l-.38-7.5a.75.75 0 0 1 .72-.79Zm6.56 0a.75.75 0 0 1 .72.79l-.38 7.5a.75.75 0 0 1-1.5-.08l.38-7.5a.75.75 0 0 1 .78-.71Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </span>
               ))
             ) : (
@@ -192,42 +259,14 @@ export const Project = () => {
 
           <div className="flex flex-col gap-3">
             {tasks.map((task) => (
-              <article
+              <TaskItem
                 key={task._id}
-                className="rounded-xl border border-white/10 bg-slate-950/50 p-4 shadow-lg ring-1 ring-white/5"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h3 className="text-base font-semibold text-white">
-                      {task.description}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-300">
-                      Asignada a:{' '}
-                      {task.assignedTo?.name ||
-                        task.assignedTo?.email ||
-                        'Sin asignar'}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        statusStyles[task.status] ||
-                        'bg-slate-500/15 text-slate-200 ring-1 ring-slate-500/30'
-                      }`}
-                    >
-                      {task.status}
-                    </span>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        priorityStyles[task.priority] ||
-                        'bg-slate-500/15 text-slate-200 ring-1 ring-slate-500/30'
-                      }`}
-                    >
-                      {task.priority}
-                    </span>
-                  </div>
-                </div>
-              </article>
+                task={task}
+                onRemove={handleRemoveTask}
+                removingTaskId={removingTaskId}
+                priorityStyles={priorityStyles}
+                statusStyles={statusStyles}
+              />
             ))}
 
             {!tasks.length && !loadingTasks && (
@@ -242,6 +281,7 @@ export const Project = () => {
       <AddTaskModal
         open={isTaskModalOpen}
         projectId={projectId}
+        collaborators={project?.collaborators}
         onCreated={() => fetchTasks(projectId)}
         onClose={() => setIsTaskModalOpen(false)}
       />

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Task from '../models/Task';
+import Project from '../models/Project';
 
 // Crear tarea
 export const createTask = async (req: Request, res: Response) => {
@@ -19,13 +20,27 @@ export const createTask = async (req: Request, res: Response) => {
 // Obtener tareas de un proyecto
 export const getTasksByProject = async (req: Request, res: Response) => {
   const { status, priority, assignedTo, projectId, sort } = req.query;
+  
   const userId = req.user!._id;
 
-  const filter: Record<string, unknown> = {
+  const accessibleProjectIds = await Project.find({
     $or: [
       { creator: userId },
-      { assignedTo: userId }
+      { collaborators: userId }
     ]
+  }).distinct('_id');
+
+  const allowedProjects =
+    typeof projectId === 'string'
+      ? accessibleProjectIds.filter((id) => id.toString() === projectId)
+      : accessibleProjectIds;
+
+  if (typeof projectId === 'string' && allowedProjects.length === 0) {
+    return res.status(403).json({ message: 'No autorizado' });
+  }
+
+  const filter: Record<string, unknown> = {
+    project: { $in: allowedProjects }
   };
 
   if (typeof status === 'string') {

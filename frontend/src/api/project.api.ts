@@ -13,3 +13,11 @@ export const addCollaboratorRequest = (
   projectId: string,
   email: string
 ) => api.post(`/projects/${projectId}/collaborators`, { email });
+
+export const removeCollaboratorRequest = (
+  projectId: string,
+  collaboratorId: string
+) =>
+  api.delete(`/projects/${projectId}/collaborators`, {
+    data: { collaboratorId },
+  });

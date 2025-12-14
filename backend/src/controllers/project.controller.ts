@@ -1,6 +1,7 @@
 import { Response, Request } from 'express';
 import Project from '../models/Project';
 import User from '../models/User';
+import Task from '../models/Task';
 
 // Crear proyecto
 export const createProject = async (req: Request, res: Response) => {
@@ -105,6 +106,18 @@ export const addCollaborator = async (req: Request, res: Response) => {
 export const removeCollaborator = async (req: Request, res: Response) => {
   const { collaboratorId } = req.body;
   const project = req.project!;
+
+  const assignedTaskExists = await Task.exists({
+    project: project._id,
+    assignedTo: collaboratorId
+  });
+
+  if (assignedTaskExists) {
+    return res.status(400).json({
+      message:
+        'No se puede eliminar al colaborador porque tiene tareas asignadas en este proyecto'
+    });
+  }
 
   project.collaborators = project.collaborators.filter(
     (id) => id.toString() !== collaboratorId

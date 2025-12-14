@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createTaskRequest } from '../api/task.api';
 
 type TaskPriority = 'baja' | 'media' | 'alta';
+type Collaborator = { _id?: string; name?: string; email?: string };
 
 type AddTaskModalProps = {
   projectId: string;
   open: boolean;
   onClose: () => void;
   onCreated: () => Promise<void> | void;
+  collaborators?: Collaborator[];
 };
 
 export const AddTaskModal = ({
@@ -15,25 +17,38 @@ export const AddTaskModal = ({
   open,
   onClose,
   onCreated,
+  collaborators = [],
 }: AddTaskModalProps) => {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('media');
+  const [assignedTo, setAssignedTo] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const collaboratorOptions = useMemo(
+    () => collaborators.filter((item) => !!item._id),
+    [collaborators]
+  );
 
   useEffect(() => {
     if (!open) {
       setDescription('');
       setPriority('media');
+      setAssignedTo('');
       setError('');
+      return;
     }
-  }, [open]);
+    if (open && collaboratorOptions.length && !assignedTo) {
+      setAssignedTo(collaboratorOptions[0]._id!);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, collaboratorOptions]);
 
   if (!open) return null;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!description.trim() || !projectId) return;
+    if (!description.trim() || !projectId || !assignedTo) return;
 
     try {
       setLoading(true);
@@ -41,6 +56,7 @@ export const AddTaskModal = ({
       await createTaskRequest(projectId, {
         description: description.trim(),
         priority,
+        assignedTo,
       });
       await onCreated();
       onClose();
@@ -102,6 +118,28 @@ export const AddTaskModal = ({
             </select>
           </label>
 
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-200">
+              Asignar a
+            </span>
+            <select
+              value={assignedTo}
+              onChange={(event) => setAssignedTo(event.target.value)}
+              className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 shadow-inner shadow-slate-950 outline-none transition duration-150 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              disabled={loading || collaboratorOptions.length === 0}
+            >
+              {collaboratorOptions.length === 0 ? (
+                <option value="">No hay colaboradores disponibles</option>
+              ) : (
+                collaboratorOptions.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.name || item.email || item._id}
+                  </option>
+                ))
+              )}
+            </select>
+          </label>
+
           {error && (
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-100 ring-1 ring-rose-500/30">
               {error}
@@ -119,7 +157,12 @@ export const AddTaskModal = ({
             </button>
             <button
               type="submit"
-              disabled={loading || !description.trim()}
+              disabled={
+                loading ||
+                !description.trim() ||
+                !assignedTo ||
+                collaboratorOptions.length === 0
+              }
               className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Guardando…' : 'Crear tarea'}
