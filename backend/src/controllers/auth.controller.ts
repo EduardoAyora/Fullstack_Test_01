@@ -1,56 +1,47 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
-
-const JWT_SECRET = process.env.JWT_SECRET as string;
+import * as AuthService from '../services/auth.service';
 
 // REGISTER
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ message: 'Email ya registrado' });
+    const { userId } = await AuthService.registerUser(
+      name,
+      email,
+      password
+    );
+
+    res.status(201).json({
+      message: 'Usuario creado',
+      userId
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      message: error.message
+    });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword
-  });
-
-  res.status(201).json({
-    message: 'Usuario creado',
-    userId: user._id
-  });
 };
 
 // LOGIN
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select('+password');
-  if (!user) {
-    return res.status(400).json({ message: 'Credenciales inválidas' });
+    const token = await AuthService.loginUser(
+      email,
+      password
+    );
+
+    res.json({ token });
+  } catch (error: any) {
+    res.status(400).json({
+      message: error.message
+    });
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.status(400).json({ message: 'Credenciales inválidas' });
-  }
-
-  const token = jwt.sign(
-    { id: user._id },
-    JWT_SECRET,
-    { expiresIn: '1d' }
-  );
-
-  res.json({ token });
 };
 
-export const profile = async (req: Request, res: Response) => {
+// PROFILE / GET USER
+export const getUser = (req: Request, res: Response) => {
   res.json(req.user);
 };
