@@ -18,12 +18,7 @@ export const createProject = async (req: Request, res: Response) => {
 export const getProjectById = async (req: Request, res: Response) => {
   const project = await Project.findById(req.project!._id)
     .populate('creator', 'name email')
-    .populate('collaborators', 'name email')
-    .populate({
-      path: 'tasks',
-      populate: { path: 'assignedTo', select: 'name email' },
-      options: { sort: { createdAt: -1 } }
-    });
+    .populate('collaborators', 'name email');
 
   res.json(project);
 };

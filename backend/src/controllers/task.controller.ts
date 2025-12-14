@@ -17,11 +17,55 @@ export const createTask = async (req: Request, res: Response) => {
 
 // Obtener tareas de un proyecto
 export const getTasksByProject = async (req: Request, res: Response) => {
-  const tasks = await Task.find({
-    project: req.body.project
-  })
+  const { status, priority, assignedTo, sort } = req.query;
+
+  const filter: Record<string, unknown> = {
+    project: req.project!._id
+  };
+
+  if (typeof status === 'string') {
+    filter.status = status;
+  }
+
+  if (typeof priority === 'string') {
+    filter.priority = priority;
+  }
+
+  if (typeof assignedTo === 'string') {
+    filter.assignedTo = assignedTo;
+  }
+
+  const sortOptions: Record<string, 1 | -1> = {};
+
+  if (typeof sort === 'string') {
+    sort.split(',').forEach((chunk) => {
+      const entry = chunk.trim();
+
+      if (!entry) return;
+
+      if (entry.startsWith('-') && entry.length > 1) {
+        sortOptions[entry.slice(1)] = -1;
+        return;
+      }
+
+      const [field, rawDirection] = entry.split(':').map((value) => value.trim());
+
+      if (!field) return;
+
+      const direction =
+        rawDirection?.toLowerCase() === 'asc' || rawDirection === '1' ? 1 : -1;
+
+      sortOptions[field] = direction;
+    });
+  }
+
+  if (Object.keys(sortOptions).length === 0) {
+    sortOptions.createdAt = -1;
+  }
+
+  const tasks = await Task.find(filter)
     .populate('assignedTo', 'name email')
-    .sort({ createdAt: -1 });
+    .sort(sortOptions);
 
   res.json(tasks);
 };

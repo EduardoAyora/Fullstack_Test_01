@@ -28,16 +28,8 @@ const projectSchema = new Schema<IProject>(
     ]
   },
   {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    timestamps: true
   }
 );
-
-projectSchema.virtual('tasks', {
-  ref: 'Task',
-  localField: '_id',
-  foreignField: 'project'
-});
 
 export default model<IProject>('Project', projectSchema);
