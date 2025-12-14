@@ -14,6 +14,7 @@ import {
     isProjectCreator,
     isProjectCreatorOrCollaborator
 } from '../middlewares/project.middleware';
+import { taskRouterByProject } from './task.routes';
 
 const router = Router();
 
@@ -257,5 +258,8 @@ router.post('/:projectId/collaborators', isProjectCreator, addCollaborator);
  *         description: Proyecto no encontrado
  */
 router.delete('/:projectId/collaborators', isProjectCreator, removeCollaborator);
+
+// Tareas
+router.use('/:projectId/tasks', taskRouterByProject);
 
 export default router;

@@ -3,7 +3,8 @@ import Task from '../models/Task';
 
 // Crear tarea
 export const createTask = async (req: Request, res: Response) => {
-  const { description, priority, assignedTo, project } = req.body;
+  const { description, priority, assignedTo } = req.body;
+  const project = req.project!._id;
 
   const task = await Task.create({
     description,
@@ -17,10 +18,14 @@ export const createTask = async (req: Request, res: Response) => {
 
 // Obtener tareas de un proyecto
 export const getTasksByProject = async (req: Request, res: Response) => {
-  const { status, priority, assignedTo, sort } = req.query;
+  const { status, priority, assignedTo, projectId, sort } = req.query;
+  const userId = req.user!._id;
 
   const filter: Record<string, unknown> = {
-    project: req.project!._id
+    $or: [
+      { creator: userId },
+      { assignedTo: userId }
+    ]
   };
 
   if (typeof status === 'string') {
@@ -33,6 +38,10 @@ export const getTasksByProject = async (req: Request, res: Response) => {
 
   if (typeof assignedTo === 'string') {
     filter.assignedTo = assignedTo;
+  }
+
+  if (typeof projectId === 'string') {
+    filter.project = projectId;
   }
 
   const sortOptions: Record<string, 1 | -1> = {};

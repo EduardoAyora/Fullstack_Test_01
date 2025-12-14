@@ -12,14 +12,61 @@ import { findTask } from '../middlewares/task.middleware';
 
 import { isProjectCreatorOrCollaborator } from '../middlewares/project.middleware';
 
-const router = Router({ mergeParams: true });
-
-router.use(authenticate);
-router.use('/:projectId', isProjectCreatorOrCollaborator);
+const taskRouter = Router();
 
 /**
  * @swagger
- * /tasks/{projectId}/tasks:
+ * /tasks:
+ *   get:
+ *     summary: Listar tareas del usuario
+ *     description: Retorna las tareas de proyectos donde el usuario es creador o colaborador, permitiendo filtros y ordenamiento.
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pendiente, "en progreso", completada]
+ *         description: Filtrar por estado de la tarea
+ *       - in: query
+ *         name: priority
+ *         schema:
+ *           type: string
+ *           enum: [baja, media, alta]
+ *         description: Filtrar por prioridad
+ *       - in: query
+ *         name: assignedTo
+ *         schema:
+ *           type: string
+ *         description: ID del usuario asignado
+ *       - in: query
+ *         name: projectId
+ *         schema:
+ *           type: string
+ *         description: ID del proyecto al que pertenece la tarea
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *         description: Campos de ordenamiento separados por coma (ej. `-createdAt` o `priority:asc,createdAt:desc`)
+ *     responses:
+ *       200:
+ *         description: Listado de tareas obtenido correctamente
+ *       401:
+ *         description: Token faltante o inválido
+ */
+taskRouter.get('/', authenticate, getTasksByProject);
+
+const taskRouterByProject = Router({ mergeParams: true });
+
+taskRouterByProject.use(authenticate);
+taskRouterByProject.use(isProjectCreatorOrCollaborator);
+
+/**
+ * @swagger
+ * /projects/{projectId}/tasks:
  *   post:
  *     summary: Crear una tarea
  *     description: Crea una tarea asociada al proyecto indicado para el creador o sus colaboradores.
@@ -55,9 +102,6 @@ router.use('/:projectId', isProjectCreatorOrCollaborator);
  *               assignedTo:
  *                 type: string
  *                 example: 64f1c8c2b1d2f7e8a9c0d1e2
- *               project:
- *                 type: string
- *                 example: 64f1c8c2b1d2f7e8a9c0d1e3
  *     responses:
  *       201:
  *         description: Tarea creada correctamente
@@ -68,61 +112,11 @@ router.use('/:projectId', isProjectCreatorOrCollaborator);
  *       404:
  *         description: Proyecto no encontrado
  */
-router.post('/:projectId/tasks', createTask);
+taskRouterByProject.post('/', createTask);
 
 /**
  * @swagger
- * /tasks/{projectId}/tasks:
- *   get:
- *     summary: Listar tareas de un proyecto
- *     description: Obtiene las tareas del proyecto con filtros por estado, prioridad, asignado y opciones de ordenamiento.
- *     tags: [Tasks]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: projectId
- *         required: true
- *         schema:
- *           type: string
- *         description: Identificador del proyecto
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [pendiente, "en progreso", completada]
- *         description: Filtra las tareas por estado
- *       - in: query
- *         name: priority
- *         schema:
- *           type: string
- *           enum: [baja, media, alta]
- *         description: Filtra las tareas por prioridad
- *       - in: query
- *         name: assignedTo
- *         schema:
- *           type: string
- *         description: ID del usuario asignado
- *       - in: query
- *         name: sort
- *         schema:
- *           type: string
- *         description: Campos de ordenamiento separados por coma. Ejemplo `-createdAt` o `priority:asc,description:desc`
- *     responses:
- *       200:
- *         description: Listado de tareas obtenido correctamente
- *       401:
- *         description: Token faltante o inválido
- *       403:
- *         description: No autorizado para gestionar tareas del proyecto
- *       404:
- *         description: Proyecto no encontrado
- */
-router.get('/:projectId/tasks', getTasksByProject);
-
-/**
- * @swagger
- * /tasks/{projectId}/tasks/{taskId}:
+ * /projects/{projectId}/tasks/{taskId}:
  *   get:
  *     summary: Obtener una tarea por ID
  *     description: Retorna la información de una tarea asociada al proyecto.
@@ -152,11 +146,11 @@ router.get('/:projectId/tasks', getTasksByProject);
  *       404:
  *         description: Tarea no encontrada
  */
-router.get('/:projectId/tasks/:taskId', findTask, getTaskById);
+taskRouterByProject.get('/:taskId', findTask, getTaskById);
 
 /**
  * @swagger
- * /tasks/{projectId}/tasks/{taskId}:
+ * /projects/{projectId}/tasks/{taskId}:
  *   put:
  *     summary: Actualizar una tarea
  *     description: Modifica los datos de una tarea existente del proyecto.
@@ -207,11 +201,11 @@ router.get('/:projectId/tasks/:taskId', findTask, getTaskById);
  *       404:
  *         description: Tarea no encontrada
  */
-router.put('/:projectId/tasks/:taskId', findTask, updateTask);
+taskRouterByProject.put('/:taskId', findTask, updateTask);
 
 /**
  * @swagger
- * /tasks/{projectId}/tasks/{taskId}:
+ * /projects/{projectId}/tasks/{taskId}:
  *   delete:
  *     summary: Eliminar una tarea
  *     description: Borra una tarea asociada al proyecto indicado.
@@ -241,6 +235,6 @@ router.put('/:projectId/tasks/:taskId', findTask, updateTask);
  *       404:
  *         description: Tarea no encontrada
  */
-router.delete('/:projectId/tasks/:taskId', findTask, deleteTask);
+taskRouterByProject.delete('/:taskId', findTask, deleteTask);
 
-export default router;
+export { taskRouter, taskRouterByProject };

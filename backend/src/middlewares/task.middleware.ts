@@ -13,7 +13,7 @@ export const findTask = async (
         return res.status(404).json({ message: 'Tarea no encontrada' });
     }
 
-    if (task.project !== req.project!._id) {
+    if (task.project.toString() !== req.project!._id.toString()) {
         return res.status(403).json({ message: 'Acceso denegado' });
     }
 

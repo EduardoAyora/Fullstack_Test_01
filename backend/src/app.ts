@@ -3,7 +3,7 @@ import cors from 'cors';
 
 import authRoutes from './routes/auth.routes';
 import projectRoutes from './routes/project.routes';
-import taskRoutes from './routes/task.routes';
+import { taskRouter as taskRoutes } from './routes/task.routes';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 
