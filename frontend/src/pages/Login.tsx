@@ -1,18 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { loginRequest } from '../api/auth.api';
 
 export const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    // Simulación de API
-    const response = {
-      token: 'fake-jwt-token',
-      user: { id: '1', email: 'test@test.com' },
-    };
+    const { data } = await loginRequest('test@test.com', '123456');
 
-    login(response.token, response.user);
+    login(data.token, data.user);
     navigate('/dashboard');
   };
 
