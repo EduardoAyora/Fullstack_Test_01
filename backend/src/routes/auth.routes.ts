@@ -44,7 +44,7 @@ router.post('/register', register);
  * /auth/login:
  *   post:
  *     summary: Iniciar sesión
- *     description: Autentica al usuario y retorna un token JWT válido por 24 horas.
+ *     description: Autentica al usuario y retorna un token JWT válido por 30 días.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -58,7 +58,7 @@ router.post('/register', register);
  *             properties:
  *               email:
  *                 type: string
- *                 example: user@mail.com
+ *                 example: juan@mail.com
  *               password:
  *                 type: string
  *                 example: 123456

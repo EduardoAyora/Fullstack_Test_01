@@ -51,11 +51,11 @@ export const loginUser = async (
   if (!isMatch) {
     throw new Error('Credenciales inválidas');
   }
-
+  
   const token = jwt.sign(
     { id: user._id },
     JWT_SECRET,
-    { expiresIn: '1d' }
+    { expiresIn: '30d' }
   );
 
   return token;
