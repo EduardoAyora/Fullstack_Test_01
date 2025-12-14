@@ -3,6 +3,13 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const ensureValidEmail = (email: string) => {
+  if (!emailRegex.test(email)) {
+    throw new Error('Email inválido');
+  }
+};
 
 // REGISTER
 export const registerUser = async (
@@ -10,6 +17,7 @@ export const registerUser = async (
   email: string,
   password: string
 ) => {
+  ensureValidEmail(email);
   const userExists = await User.findOne({ email });
   if (userExists) {
     throw new Error('Email ya registrado');
@@ -33,6 +41,7 @@ export const loginUser = async (
   email: string,
   password: string
 ) => {
+  ensureValidEmail(email);
   const user = await User.findOne({ email }).select('+password');
   if (!user) {
     throw new Error('Credenciales inválidas');
