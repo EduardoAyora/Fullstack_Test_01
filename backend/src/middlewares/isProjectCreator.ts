@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import Project from '../models/Project';
-import { ProjectRequest } from '../types/request';
 
 export const isProjectCreator = async (
-  req: ProjectRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -14,7 +13,7 @@ export const isProjectCreator = async (
     return res.status(404).json({ message: 'Proyecto no encontrado' });
   }
 
-  if (project.creator.toString() !== req.user.id) {
+  if (project.creator.toString() !== req.user!.id) {
     return res.status(403).json({ message: 'No autorizado' });
   }
 

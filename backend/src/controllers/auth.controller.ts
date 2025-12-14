@@ -50,3 +50,7 @@ export const login = async (req: Request, res: Response) => {
 
   res.json({ token });
 };
+
+export const profile = async (req: Request, res: Response) => {
+  res.json(req.user);
+};

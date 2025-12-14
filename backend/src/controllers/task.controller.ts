@@ -1,9 +1,8 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import Task from '../models/Task';
-import { TaskRequest } from '../types/request';
 
 // Crear tarea
-export const createTask = async (req: TaskRequest, res: Response) => {
+export const createTask = async (req: Request, res: Response) => {
   const { description, priority, assignedTo, project } = req.body;
 
   const task = await Task.create({
@@ -17,7 +16,7 @@ export const createTask = async (req: TaskRequest, res: Response) => {
 };
 
 // Obtener tareas de un proyecto
-export const getTasksByProject = async (req: TaskRequest, res: Response) => {
+export const getTasksByProject = async (req: Request, res: Response) => {
   const tasks = await Task.find({
     project: req.body.project
   })
@@ -28,14 +27,14 @@ export const getTasksByProject = async (req: TaskRequest, res: Response) => {
 };
 
 // Obtener tarea por ID
-export const getTaskById = async (req: TaskRequest, res: Response) => {
+export const getTaskById = async (req: Request, res: Response) => {
   res.json(req.task);
 };
 
 // Actualizar tarea
-export const updateTask = async (req: TaskRequest, res: Response) => {
+export const updateTask = async (req: Request, res: Response) => {
   const { description, status, priority, assignedTo } = req.body;
-  const task = req.task;
+  const task = req.task!;
 
   task.description = description ?? task.description;
   task.status = status ?? task.status;
@@ -48,8 +47,8 @@ export const updateTask = async (req: TaskRequest, res: Response) => {
 };
 
 // Eliminar tarea
-export const deleteTask = async (req: TaskRequest, res: Response) => {
-  const task = req.task;
+export const deleteTask = async (req: Request, res: Response) => {
+  const task = req.task!;
 
   await task.deleteOne();
 
