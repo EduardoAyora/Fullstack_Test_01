@@ -18,7 +18,7 @@ const taskRouter = Router();
  * @swagger
  * /tasks:
  *   get:
- *     summary: Listar tareas del usuario
+ *     summary: Listar tareas con filtros y ordenamiento
  *     description: Retorna las tareas de proyectos donde el usuario es creador o colaborador, permitiendo filtros y ordenamiento.
  *     tags: [Tasks]
  *     security:
