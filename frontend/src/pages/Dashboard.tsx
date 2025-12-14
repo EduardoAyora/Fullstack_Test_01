@@ -96,13 +96,13 @@ export const Dashboard = () => {
           </div>
           <button
             onClick={logout}
-            className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/30 hover:bg-white/5"
+            className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/50 hover:bg-white/10"
           >
             Cerrar sesión
           </button>
         </header>
 
-        <section className="rounded-2xl md:max-w-3/4 bg-slate-900/60 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
+        <section className="rounded-2xl md:max-w-3/4 border-white/15 border bg-slate-800/70 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
           <form
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
             onSubmit={handleCreate}
@@ -139,7 +139,7 @@ export const Dashboard = () => {
           {projects.map((project) => (
             <article
               key={project._id}
-              className="rounded-xl border border-white/5 bg-slate-900/50 p-5 shadow-lg ring-1 ring-white/10 backdrop-blur transition hover:-translate-y-1 hover:border-white/15 hover:ring-white/20"
+              className="rounded-xl border border-white/15 bg-slate-800/70 p-5 shadow-lg ring-1 ring-white/20 backdrop-blur transition hover:-translate-y-1 hover:border-white/40 hover:ring-white/40"
             >
               <h3 className="text-lg font-semibold text-white">
                 {project.name}
@@ -160,7 +160,7 @@ export const Dashboard = () => {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1 || loading}
-            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 transition hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-slate-800/70 border border-white/30 px-3 py-2 text-sm text-slate-200 transition hover:border-white/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Anterior
           </button>
@@ -168,7 +168,7 @@ export const Dashboard = () => {
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={loading || !hasNextPage}
-            className="rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-200 transition hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-slate-800/70 border border-white/30 px-3 py-2 text-sm text-slate-200 transition hover:border-white/50 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Siguiente
           </button>
