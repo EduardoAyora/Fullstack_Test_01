@@ -31,7 +31,7 @@ export const TaskItem = ({
   statusStyles,
 }: TaskItemProps) => {
   return (
-    <article className="rounded-xl border border-white/10 bg-slate-950/50 p-4 shadow-lg ring-1 ring-white/5">
+    <article className="rounded-xl border border-white/10 bg-slate-700/30 p-4 shadow-lg ring-1 ring-white/5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-start gap-2">

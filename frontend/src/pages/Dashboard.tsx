@@ -86,7 +86,7 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-800 via-slate-900 to-black text-slate-100">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-12">
+      <div className="mx-auto flex max-w-4xl flex-col gap-10 px-6 py-12">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-slate-300">Bienvenido</p>

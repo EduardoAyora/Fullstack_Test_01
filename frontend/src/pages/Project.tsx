@@ -150,8 +150,8 @@ export const Project = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-black text-slate-100">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10">
+    <div className="min-h-screen bg-linear-to-br from-slate-800 via-slate-900 to-black text-slate-100">
+      <div className="mx-auto flex max-w-4xl flex-col gap-8 px-6 py-10">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-slate-300">Proyecto</p>
@@ -179,7 +179,7 @@ export const Project = () => {
           </p>
         )}
 
-        <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
+        <section className="rounded-2xl border border-white/10 bg-slate-800/70 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
           <div className="mb-3 flex flex-wrap items-center gap-3">
             <h2 className="text-lg font-semibold text-white">
               Colaboradores
@@ -240,7 +240,7 @@ export const Project = () => {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-white/10 bg-slate-900/60 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
+        <section className="rounded-2xl border border-white/10 bg-slate-800/70 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <h2 className="text-lg font-semibold text-white">Tareas</h2>
             {loadingTasks && (
