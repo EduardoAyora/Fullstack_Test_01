@@ -11,6 +11,7 @@ import { AddCollaboratorModal } from '../components/AddCollaboratorModal';
 import { TaskItem } from '../components/TaskItem';
 import { EditProjectModal } from '../components/EditProjectModal';
 import { ConfirmDeleteProject } from '../components/ConfirmDeleteProject';
+import { useAuth } from '../auth/useAuth';
 
 type Person = {
   _id?: string;
@@ -39,6 +40,7 @@ type Task = {
 export const Project = () => {
   const { projectId: routeProjectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [projectId, setProjectId] = useState<string>('');
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -169,6 +171,11 @@ export const Project = () => {
     []
   );
 
+  const isCreator = useMemo(
+    () => project?.creator?._id && user?.id && project.creator._id === user.id,
+    [project?.creator?._id, user?.id]
+  );
+
   if (!routeProjectId) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -183,51 +190,55 @@ export const Project = () => {
               <h1 className="text-3xl font-semibold text-white">
                 {loadingProject ? 'Cargando…' : project?.name || 'Proyecto'}
               </h1>
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-white/25 hover:bg-white/10"
-                title="Editar nombre"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-4 w-4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsDeleteConfirmOpen(true)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-rose-300/70 hover:bg-rose-500/20 hover:text-rose-100"
-                title="Eliminar proyecto"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-4 w-4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M3 6h18" />
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                  <line x1="10" x2="10" y1="11" y2="17" />
-                  <line x1="14" x2="14" y1="11" y2="17" />
-                </svg>
-              </button>
+              {isCreator && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-white/25 hover:bg-white/10"
+                    title="Editar nombre"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="h-4 w-4"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4Z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteConfirmOpen(true)}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-slate-200 transition hover:border-rose-300/70 hover:bg-rose-500/20 hover:text-rose-100"
+                    title="Eliminar proyecto"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="h-4 w-4"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      <line x1="10" x2="10" y1="11" y2="17" />
+                      <line x1="14" x2="14" y1="11" y2="17" />
+                    </svg>
+                  </button>
+                </>
+              )}
             </div>
             <p className="text-sm text-slate-300">
               Creador:{' '}
@@ -260,15 +271,17 @@ export const Project = () => {
             <span className="text-xs text-slate-400">
               {project?.collaborators?.length || 0} en total
             </span>
-            <div className="ml-auto">
-              <button
-                type="button"
-                onClick={() => setIsCollaboratorModalOpen(true)}
-                className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-900"
-              >
-                Agregar colaborador
-              </button>
-            </div>
+            {isCreator && (
+              <div className="ml-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsCollaboratorModalOpen(true)}
+                  className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-900"
+                >
+                  Agregar colaborador
+                </button>
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             {project?.collaborators?.length ? (
@@ -278,7 +291,7 @@ export const Project = () => {
                   className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-slate-100 ring-1 ring-white/10"
                 >
                   {collaborator.name || collaborator.email || 'Colaborador'}
-                  {collaborator._id && (
+                  {isCreator && collaborator._id && (
                     <button
                       type="button"
                       onClick={() =>
