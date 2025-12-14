@@ -75,15 +75,15 @@ router.post('/login', login);
  * /auth/profile:
  *   get:
  *     summary: Obtener perfil del usuario autenticado
- *     description: Retorna la información del usuario basada en el token JWT enviado en el header Authorization.
+ *     description: Retorna la información del usuario basada en el token JWT enviado en el encabezado Authorization.
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Perfil del usuario autenticado
+ *         description: Perfil obtenido correctamente
  *       401:
- *         description: Token inválido o no enviado
+ *         description: Token inválido o no proporcionado
  */
 router.get('/profile', authenticate, getUser);
 

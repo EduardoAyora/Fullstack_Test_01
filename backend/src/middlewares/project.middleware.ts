@@ -13,7 +13,7 @@ export const isProjectCreator = async (
     return res.status(404).json({ message: 'Proyecto no encontrado' });
   }
 
-  if (project.creator.toString() !== req.user!.id) {
+  if (project.creator !== req.user!._id) {
     return res.status(403).json({ message: 'No autorizado' });
   }
 

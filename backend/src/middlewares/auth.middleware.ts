@@ -29,7 +29,7 @@ export const authenticate = async (
       return res.status(401).json({ message: 'Token inválido' });
     }
 
-    req.user = { id: user._id };
+    req.user = user;
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Token inválido' });

@@ -8,7 +8,7 @@ export const createProject = async (req: Request, res: Response) => {
 
   const project = await Project.create({
     name,
-    creator: req.user!.id,
+    creator: req.user!._id,
     collaborators: []
   });
 
@@ -17,7 +17,7 @@ export const createProject = async (req: Request, res: Response) => {
 
 // Obtener proyectos del usuario
 export const getProjects = async (req: Request, res: Response) => {
-  const userId = new Types.ObjectId(req.user!.id);
+  const userId = req.user!._id;
 
   const projects = await Project.find({
     $or: [
