@@ -1,9 +1,11 @@
 import { Schema, model, Document, Types } from 'mongoose';
+import type { ITask } from './Task';
 
 export interface IProject extends Document {
   name: string;
   creator: Types.ObjectId;
   collaborators: Types.ObjectId[];
+  tasks?: ITask[];
 }
 
 const projectSchema = new Schema<IProject>(
@@ -26,8 +28,16 @@ const projectSchema = new Schema<IProject>(
     ]
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
+
+projectSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'project'
+});
 
 export default model<IProject>('Project', projectSchema);

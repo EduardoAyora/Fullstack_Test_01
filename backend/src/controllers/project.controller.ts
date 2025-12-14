@@ -15,6 +15,19 @@ export const createProject = async (req: Request, res: Response) => {
   res.status(201).json(project);
 };
 
+export const getProjectById = async (req: Request, res: Response) => {
+  const project = await Project.findById(req.project!._id)
+    .populate('creator', 'name email')
+    .populate('collaborators', 'name email')
+    .populate({
+      path: 'tasks',
+      populate: { path: 'assignedTo', select: 'name email' },
+      options: { sort: { createdAt: -1 } }
+    });
+
+  res.json(project);
+};
+
 // Obtener proyectos del usuario
 export const getProjects = async (req: Request, res: Response) => {
   const userId = req.user!._id;
@@ -39,6 +52,15 @@ export const updateProject = async (req: Request, res: Response) => {
   await project.save();
 
   res.json(project);
+};
+
+// Eliminar proyecto
+export const deleteProject = async (req: Request, res: Response) => {
+  const project = req.project!;
+
+  await project.deleteOne();
+
+  res.json({ message: 'Proyecto eliminado correctamente' });
 };
 
 // Agregar colaborador
@@ -68,13 +90,4 @@ export const removeCollaborator = async (req: Request, res: Response) => {
   await project.save();
 
   res.json(project);
-};
-
-// Eliminar proyecto
-export const deleteProject = async (req: Request, res: Response) => {
-  const project = req.project!;
-
-  await project.deleteOne();
-
-  res.json({ message: 'Proyecto eliminado correctamente' });
 };
