@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { createProjectRequest, listProjects } from '../api/project.api';
 import { profileRequest } from '../api/auth.api';
@@ -39,6 +40,11 @@ export const Dashboard = () => {
     }
   };
 
+  useEffect(() => {
+    fetchProjects(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
+
   const fetchProfile = async () => {
     try {
       const { data: profile } = await profileRequest();
@@ -59,11 +65,6 @@ export const Dashboard = () => {
     fetchProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    fetchProjects(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
 
   const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -137,17 +138,19 @@ export const Dashboard = () => {
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
-            <article
+            <Link
               key={project._id}
-              className="rounded-xl border border-white/15 bg-slate-800/70 p-5 shadow-lg ring-1 ring-white/20 backdrop-blur transition hover:-translate-y-1 hover:border-white/40 hover:ring-white/40"
+              to={`/projects/${project._id}`}
+              className="rounded-xl border border-white/15 bg-slate-800/70 p-5 shadow-lg ring-1 ring-white/20 backdrop-blur transition hover:-translate-y-1 hover:border-white/40 hover:ring-white/40 focus:outline-none focus:ring-2 focus:ring-sky-400"
             >
               <h3 className="text-lg font-semibold text-white">
                 {project.name}
               </h3>
               <p className="mt-2 text-sm text-slate-300">
-                Creador: {project.creator?.name || project.creator?.email || 'N/D'}
+                Creador:{' '}
+                {project.creator?.name || project.creator?.email || 'N/D'}
               </p>
-            </article>
+            </Link>
           ))}
           {!projects.length && !loading && (
             <div className="col-span-full rounded-xl border border-dashed border-white/10 p-8 text-center text-slate-300">

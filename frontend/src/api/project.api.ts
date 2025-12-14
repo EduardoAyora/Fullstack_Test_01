@@ -5,3 +5,6 @@ export const listProjects = (page = 1, limit = 10) =>
 
 export const createProjectRequest = (name: string) =>
   api.post('/projects', { name });
+
+export const getProjectById = (projectId: string) =>
+  api.get(`/projects/${projectId}`);
