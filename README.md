@@ -199,7 +199,19 @@ Si tienes dudas sobre los requisitos, no dudes en contactarnos.
 > **Nota**: Completa esta sección con las instrucciones para ejecutar tu proyecto.
 
 ## Prerrequisitos
-[Tus prerrequisitos]
+Este proyecto se puede ejecutar teniendo instalado docker compose, o node v21.
+
+## Instrucciones docker compose
+
+En el caso de tener docker compose ejecutar:
+
+```bash
+docker compose up --build
+```
+
+Y en el navegador ingresar a `http://localhost:4173/`.
+
+## Instrucciones node v21
 
 ## Instalación
 ```bash
