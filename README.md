@@ -196,7 +196,12 @@ Si tienes dudas sobre los requisitos, no dudes en contactarnos.
 
 # 📖 Instrucciones de Ejecución
 
-> **Nota**: Completa esta sección con las instrucciones para ejecutar tu proyecto.
+La aplicación también está disponible en la web en
+`https://fullstack-test-01-smoky.vercel.app/`.
+
+Está alojada en servidores gratuitos, por lo que el backend puede tardar hasta 50 segundos en responder en la primera solicitud.
+
+A continuación, se muestra la ejecución del proyecto en entorno local:
 
 ## Prerrequisitos
 Este proyecto se puede ejecutar teniendo instalado docker compose, o node v21.
