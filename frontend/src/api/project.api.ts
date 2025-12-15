@@ -1,7 +1,7 @@
 import { api } from './axios';
 
-export const listProjects = (page = 1, limit = 10) =>
-  api.get('/projects', { params: { page, limit } });
+export const listProjects = (page = 1, limit = 10, name?: string) =>
+  api.get('/projects', { params: { page, limit, name } });
 
 export const createProjectRequest = (name: string) =>
   api.post('/projects', { name });

@@ -73,6 +73,11 @@ router.post('/', createProject);
  *           type: integer
  *           minimum: 1
  *         description: Cantidad de proyectos por página (por defecto 10)
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: Filtro por nombre del proyecto (búsqueda parcial, insensible a mayúsculas)
  *     responses:
  *       200:
  *         description: Listado paginado de proyectos

@@ -30,13 +30,19 @@ export const getProjects = async (req: Request, res: Response) => {
   const page = Math.max(parseInt(req.query.page as string) || 1, 1);
   const limit = Math.max(parseInt(req.query.limit as string) || 10, 1);
   const skip = (page - 1) * limit;
+  const name =
+    typeof req.query.name === 'string' ? req.query.name.trim() : '';
 
-  const filter = {
+  const filter: Record<string, unknown> = {
     $or: [
       { creator: userId },
       { collaborators: userId }
     ]
   };
+
+  if (name) {
+    filter.name = { $regex: name, $options: 'i' };
+  }
 
   const [total, projects] = await Promise.all([
     Project.countDocuments(filter),
