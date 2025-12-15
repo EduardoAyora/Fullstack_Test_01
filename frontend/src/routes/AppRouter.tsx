@@ -3,6 +3,7 @@ import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
 import { Dashboard } from '../pages/Dashboard';
 import { Project } from '../pages/Project';
+import { Stats } from '../pages/Stats';
 import { RedirectRoot } from './RedirectRoot';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { useAuth } from '../auth/useAuth';
@@ -27,6 +28,7 @@ export const AppRouter = () => {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects/:projectId" element={<Project />} />
+        <Route path="/stats" element={<Stats />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" />} />

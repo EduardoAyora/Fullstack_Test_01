@@ -103,12 +103,20 @@ export const Dashboard = () => {
             </h1>
             <p className="text-slate-400">{userLabel}</p>
           </div>
-          <button
-            onClick={logout}
-            className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/50 hover:bg-white/10"
-          >
-            Cerrar sesión
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/stats"
+              className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/50 hover:bg-white/10"
+            >
+              Ver estadísticas
+            </Link>
+            <button
+              onClick={logout}
+              className="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/50 hover:bg-white/10"
+            >
+              Cerrar sesión
+            </button>
+          </div>
         </header>
 
         <section className="rounded-2xl md:max-w-3/4 border-white/15 border bg-slate-800/70 p-6 shadow-xl ring-1 ring-white/10 backdrop-blur space-y-4">
