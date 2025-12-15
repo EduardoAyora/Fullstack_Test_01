@@ -38,44 +38,44 @@
 ```
 backend/
 ├── src/
-│   ├── [tu estructura]
-│   └── ...
+│   ├── config        # configuración DB, Swagger
+│   ├── middlewares   # validaciones y guardado en requests
+│   ├── models        # esquemas de Mongoose
+│   ├── controllers   # lógica HTTP de entrada/salida
+│   ├── routes        # definición de rutas y conexión con middlewares
+│   ├── services      # lógica de dominio reutilizable (auth)
+│   └── types         # tipados globales para Express y modelos
 ```
 
 **Razón de esta estructura:**
-[Explica por qué organizaste tu código de esta manera]
+Separé capas por responsabilidad (entrada HTTP, reglas de dominio, persistencia y configuración) para mantener acoplamiento bajo. Los `middlewares` resuelven autenticación, carga de entidades y los `services` encapsulan lógica reutilizable independiente del transporte.
 
 ### Estructura del Frontend
 
 ```
 frontend/
 ├── src/
-│   ├── [tu estructura]
-│   └── ...
+│   ├── api           # clientes fetch centralizados por recurso
+│   ├── auth          # helpers de autenticación y autorización
+│   ├── components    # UI reusable
+│   ├── pages         # vistas por ruta
+│   ├── routes        # configuración de rutas protegidas/públicas
+│   ├── types         # contratos tipados
+│   └── utils         # utilidades puras
 ```
 
 **Razón de esta estructura:**
-[Explica por qué organizaste tu código de esta manera]
+La separación por dominio (api, auth) y por tipo (components, pages) evita dependencias circulares y facilita sustituir el router o el cliente HTTP sin tocar las vistas.
 
 ---
 
 ## 🗄️ Diseño de Base de Datos
 
-### Elección: MySQL / MongoDB
-
-**Razones:**
-- [Razón 1]
-- [Razón 2]
-- [Razón 3]
-
 ### Schema/Modelos
 
-[Describe brevemente tus tablas/colecciones principales]
+Tengo 3 colecciones, User, Project y Task.
 
-**Decisiones importantes:**
-- **Normalización** (si usas MySQL): [Explica cómo normalizaste]
-- **Índices**: [Qué índices agregaste y por qué]
-- **Relaciones**: [Cómo manejaste las relaciones entre entidades]
+Un proyecto tiene un creador (el cuál es un User) y colaboradores (User[]) resulta natural guardarlo de esta manera. La tarea tiene una referencia al proyecto
 
 ---
 

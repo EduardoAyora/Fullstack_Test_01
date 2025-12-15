@@ -197,7 +197,7 @@ Si tienes dudas sobre los requisitos, no dudes en contactarnos.
 # 📖 Instrucciones de Ejecución
 
 La aplicación también está disponible en la web en
-`https://fullstack-test-01-smoky.vercel.app/`.
+`https://fullstack-test-01-smoky.vercel.app/`. Y la documentación del API está disponible en `https://fullstack-test-01.onrender.com/api/docs/`.
 
 Está alojada en servidores gratuitos, por lo que el backend puede tardar hasta 50 segundos en responder en la primera solicitud.
 
