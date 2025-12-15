@@ -4,7 +4,7 @@
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "test": "node -r ts-node/register --test \"src/**/*.test.ts\""
+    "test": "node -r ts-node/register --test $(find src -name \"*.test.ts\")"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

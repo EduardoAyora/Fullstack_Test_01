@@ -1,16 +1,14 @@
 # Decisiones Técnicas
-## [Tu Nombre]
-
-> **Nota**: Este es un archivo opcional pero recomendado. Documentar tus decisiones técnicas demuestra pensamiento crítico y puede sumar puntos extra en la evaluación.
+## Eduardo Ayora
 
 ---
 
 ## 📋 Información General
 
-- **Nombre del Candidato**: [Tu nombre completo]
-- **Fecha de Inicio**: [DD/MM/YYYY]
-- **Fecha de Entrega**: [DD/MM/YYYY]
-- **Tiempo Dedicado**: [Ej: ~20 horas]
+- **Nombre del Candidato**: Eduardo Antonio Ayora Ochoa
+- **Fecha de Inicio**: 13/12/2025
+- **Fecha de Entrega**: 14/12/2025
+- **Tiempo Dedicado**: 18 horas
 
 ---
 
@@ -20,22 +18,16 @@
 
 | Tecnología | Versión | Razón de Elección |
 |------------|---------|-------------------|
-| Node.js | 18.x | [Explica por qué elegiste esta versión] |
-| Express | 4.x | [Razón] |
-| Base de Datos | MySQL/MongoDB | [¿Por qué elegiste esta sobre la otra?] |
-| ORM/ODM | Sequelize/Mongoose | [Razón] |
-| Validación | express-validator/Joi/Zod | [Razón] |
-| Testing | Jest/Mocha | [Razón] |
+| Node.js | 21.x | Esta versión es compatible con vite.js |
+| Base de Datos | MongoDB | Porque era más natural almacenar ciertos datos dentro de los documentos en lugar de utilizar llaves foráneas, como por ejemplo almacenar los colaboradores dentro de los proyectos |
 
 ### Frontend
 
 | Tecnología | Versión | Razón de Elección |
 |------------|---------|-------------------|
-| React | 18.x | [Razón] |
-| Build Tool | Vite/CRA | [¿Por qué elegiste este?] |
-| Estado Global | Context/Redux/Zustand | [Razón] |
-| Estilos | CSS/Tailwind/MUI/etc | [Razón] |
-| Formularios | react-hook-form/Formik | [Razón] |
+| Build Tool | Vite | Por su arranque de desarrollo y recarga en caliente rápida |
+| Estado Global | Context | El estado global de la aplicación es relativamente simple y no requiere una solución avanzada de gestión de estado |
+| Estilos | Tailwind | Permite desarrollar interfaces de forma rápida sin necesidad de escribir CSS personalizado |
 
 ---
 

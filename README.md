@@ -272,6 +272,8 @@ npm run dev
 ### Tests
 ```bash
 # Comandos de tests
+cd ./backend/
+npm run test
 ```
 
 ## API Documentation
