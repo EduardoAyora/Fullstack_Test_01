@@ -12,6 +12,7 @@ import { TaskItem } from '../components/TaskItem';
 import { EditProjectModal } from '../components/EditProjectModal';
 import { ConfirmDeleteProject } from '../components/ConfirmDeleteProject';
 import { useAuth } from '../auth/useAuth';
+import { EditTaskModal } from '../components/EditTaskModal';
 
 type Person = {
   _id?: string;
@@ -56,6 +57,8 @@ export const Project = () => {
     useState<string | null>(null);
   const [removingTaskId, setRemovingTaskId] = useState<string | null>(null);
   const [deletingProject, setDeletingProject] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
 
   useEffect(() => {
     if (routeProjectId) {
@@ -92,6 +95,11 @@ export const Project = () => {
     } finally {
       setRemovingTaskId(null);
     }
+  };
+
+  const handleOpenEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsEditTaskModalOpen(true);
   };
 
   const fetchTasks = async (id: string) => {
@@ -349,6 +357,7 @@ export const Project = () => {
                 key={task._id}
                 task={task}
                 onRemove={handleRemoveTask}
+                onEdit={handleOpenEditTask}
                 removingTaskId={removingTaskId}
                 priorityStyles={priorityStyles}
                 statusStyles={statusStyles}
@@ -370,6 +379,17 @@ export const Project = () => {
         collaborators={project?.collaborators}
         onCreated={() => fetchTasks(projectId)}
         onClose={() => setIsTaskModalOpen(false)}
+      />
+      <EditTaskModal
+        open={isEditTaskModalOpen}
+        projectId={projectId}
+        task={editingTask}
+        collaborators={project?.collaborators}
+        onUpdated={() => fetchTasks(projectId)}
+        onClose={() => {
+          setIsEditTaskModalOpen(false);
+          setEditingTask(null);
+        }}
       />
       <AddCollaboratorModal
         open={isCollaboratorModalOpen}
