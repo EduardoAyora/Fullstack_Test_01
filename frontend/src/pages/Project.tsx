@@ -48,6 +48,17 @@ export const Project = () => {
   const [loadingProject, setLoadingProject] = useState(false);
   const [loadingTasks, setLoadingTasks] = useState(false);
   const [error, setError] = useState('');
+  const [taskFilters, setTaskFilters] = useState<{
+    status: string;
+    priority: string;
+    assignedTo: string;
+    sort: string;
+  }>({
+    status: '',
+    priority: '',
+    assignedTo: '',
+    sort: '',
+  });
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [isCollaboratorModalOpen, setIsCollaboratorModalOpen] =
     useState(false);
@@ -87,7 +98,7 @@ export const Project = () => {
       setRemovingTaskId(taskId);
       setError('');
       await deleteTaskRequest(projectId, taskId);
-      await fetchTasks(projectId);
+      await fetchTasks(projectId, taskFilters);
     } catch (err: any) {
       const message =
         err?.response?.data?.message || 'No se pudo eliminar la tarea.';
@@ -102,11 +113,35 @@ export const Project = () => {
     setIsEditTaskModalOpen(true);
   };
 
-  const fetchTasks = async (id: string) => {
+  const handleFilterChange = (
+    field: keyof typeof taskFilters,
+    value: string
+  ) => {
+    setTaskFilters((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleResetFilters = () => {
+    setTaskFilters({
+      status: '',
+      priority: '',
+      assignedTo: '',
+      sort: '',
+    });
+  };
+
+  const fetchTasks = async (
+    id: string,
+    filters: {
+      status?: string;
+      priority?: string;
+      assignedTo?: string;
+      sort?: string;
+    } = taskFilters
+  ) => {
     try {
       setLoadingTasks(true);
       setError('');
-      const { data } = await getTasksByProject(id);
+      const { data } = await getTasksByProject(id, filters);
       
       setTasks(data ?? []);
     } catch (err: any) {
@@ -124,6 +159,12 @@ export const Project = () => {
     fetchTasks(projectId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
+
+  useEffect(() => {
+    if (!projectId) return;
+    fetchTasks(projectId, taskFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskFilters]);
 
   const handleRemoveCollaborator = async (collaboratorId?: string) => {
     if (!collaboratorId || !projectId) return;
@@ -182,6 +223,11 @@ export const Project = () => {
   const isCreator = useMemo(
     () => project?.creator?._id && user?.id && project.creator._id === user.id,
     [project?.creator?._id, user?.id]
+  );
+
+  const collaboratorOptions = useMemo(
+    () => project?.collaborators?.filter((c) => c._id) ?? [],
+    [project?.collaborators]
   );
 
   if (!routeProjectId) {
@@ -343,12 +389,87 @@ export const Project = () => {
             <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setIsTaskModalOpen(true)}
+                onClick={() => {
+                  if (!project?.collaborators || project.collaborators.length === 0) {
+                    setError('Agrega colaboradores al proyecto antes de crear tareas.');
+                    return;
+                  }
+                  setError('');
+                  setIsTaskModalOpen(true);
+                }}
                 className="rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:translate-y-[-1px] hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-slate-900"
               >
                 Agregar tarea
               </button>
             </div>
+          </div>
+          <div className="mb-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
+            <label className="block space-y-1">
+              <span className="text-xs text-slate-300">Estado</span>
+              <select
+                value={taskFilters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950 outline-none transition duration-150 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              >
+                <option value="">Todos</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en progreso">En progreso</option>
+                <option value="completada">Completada</option>
+              </select>
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs text-slate-300">Prioridad</span>
+              <select
+                value={taskFilters.priority}
+                onChange={(e) => handleFilterChange('priority', e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950 outline-none transition duration-150 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              >
+                <option value="">Todas</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs text-slate-300">Asignada a</span>
+              <select
+                value={taskFilters.assignedTo}
+                onChange={(e) =>
+                  handleFilterChange('assignedTo', e.target.value)
+                }
+                className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950 outline-none transition duration-150 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              >
+                <option value="">Todos</option>
+                {collaboratorOptions.map((col) => (
+                  <option key={col._id} value={col._id}>
+                    {col.name || col.email || col._id}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block space-y-1">
+              <span className="text-xs text-slate-300">Orden</span>
+              <select
+                value={taskFilters.sort}
+                onChange={(e) => handleFilterChange('sort', e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950 outline-none transition duration-150 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              >
+                <option value="">Por defecto</option>
+                <option value="createdAt:asc">Fecha de creación ascendente</option>
+                <option value="createdAt:desc">Fecha de creación descendente</option>
+                <option value="priority:asc">Prioridad ascendente</option>
+                <option value="priority:desc">Prioridad descendente</option>
+              </select>
+            </label>
+          </div>
+          <div className="mb-4 flex justify-end">
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="rounded-xl border border-white/15 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/30 hover:bg-white/5"
+            >
+              Limpiar filtros
+            </button>
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -366,7 +487,7 @@ export const Project = () => {
 
             {!tasks.length && !loadingTasks && (
               <div className="rounded-xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-slate-300">
-                No hay tareas aún en este proyecto.
+                No hay tareas en este proyecto o con este filtro.
               </div>
             )}
           </div>
@@ -377,7 +498,7 @@ export const Project = () => {
         open={isTaskModalOpen}
         projectId={projectId}
         collaborators={project?.collaborators}
-        onCreated={() => fetchTasks(projectId)}
+        onCreated={() => fetchTasks(projectId, taskFilters)}
         onClose={() => setIsTaskModalOpen(false)}
       />
       <EditTaskModal
@@ -385,7 +506,7 @@ export const Project = () => {
         projectId={projectId}
         task={editingTask}
         collaborators={project?.collaborators}
-        onUpdated={() => fetchTasks(projectId)}
+        onUpdated={() => fetchTasks(projectId, taskFilters)}
         onClose={() => {
           setIsEditTaskModalOpen(false);
           setEditingTask(null);

@@ -33,8 +33,8 @@ export const TaskItem = ({
   statusStyles,
 }: TaskItemProps) => {
   return (
-    <article className="relative rounded-xl border border-white/10 bg-slate-700/30 p-4 pr-16 shadow-lg ring-1 ring-white/5">
-      <div className="absolute right-3 top-3 flex items-center gap-2">
+    <article className="relative rounded-xl border border-white/10 bg-slate-700/30 p-4 pr-20 shadow-lg ring-1 ring-white/5">
+      <div className="absolute right-3 top-3 flex items-center gap-1">
         <button
           type="button"
           onClick={() => onEdit(task)}

@@ -1,7 +1,14 @@
 import { api } from './axios';
 
-export const getTasksByProject = (projectId: string) =>
-  api.get('/tasks', { params: { projectId } });
+export const getTasksByProject = (
+  projectId: string,
+  filters?: {
+    status?: string;
+    priority?: string;
+    assignedTo?: string;
+    sort?: string;
+  }
+) => api.get('/tasks', { params: { projectId, ...filters } });
 
 export const createTaskRequest = (
   projectId: string,
