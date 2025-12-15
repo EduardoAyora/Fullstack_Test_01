@@ -209,33 +209,68 @@ En el caso de tener docker compose ejecutar:
 docker compose up --build
 ```
 
-Y en el navegador ingresar a `http://localhost:4173/`.
+Para ver la app hay que dirigirse a `http://localhost:4173/`.
+Para ver la documentación del API hay que dirigirse a `http://localhost:3000/api/docs/`.
 
 ## Instrucciones node v21
 
-## Instalación
+### Instalación
 ```bash
-# Tus comandos
+# backend
+cd ./backend/
+npm install
+
+# frontend
+cd ./frontend/
+npm install
 ```
 
-## Configuración
+### Configuración
+
+En la carpeta `/backend` crear el archivo `.env` y agregar las credenciales de mi base mongodb para pruebas:
+
 ```bash
 # Variables de entorno
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Database Configuration
+# For MySQL
+MONGO_URI=mongodb+srv://eduadmin:edumongo@cluster0.bbudikd.mongodb.net/?appName=Cluster0
+DB_HOST=mongodb+srv://eduadmin:edumongo@cluster0.bbudikd.mongodb.net/?
+DB_PORT=3306
+
+# JWT Configuration
+JWT_SECRET=texto-random-87234691238
+JWT_EXPIRES_IN=30d
 ```
 
-## Ejecución
+En la carpeta `/frontend` crear el archivo `.env` y agregar:
+
+```bash
+VITE_API_URL=http://localhost:3000/api
+```
+
+### Ejecución
+
 ```bash
 # Backend
+cd ./backend/
+npm run dev
+
 # Frontend
+cd ./frontend/
+npm run dev
 ```
 
-## Tests
+### Tests
 ```bash
 # Comandos de tests
 ```
 
 ## API Documentation
-- Swagger: [Tu URL]
+- Swagger: http://localhost:3000/api/docs/
 
 ## Credenciales de Prueba
-[Si aplica]
+Pueden registrarse libremente en la aplicación para realizar todas las pruebas necesarias. Se pueden utilizar múltiples direcciones de correo electrónico de prueba.
